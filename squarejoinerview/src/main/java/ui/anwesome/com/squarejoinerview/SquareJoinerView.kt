@@ -67,4 +67,40 @@ class SquareJoinerView(ctx:Context):View(ctx) {
             }
         }
     }
+    data class SquareJoiner(var x:Float, var y:Float, var w:Float) {
+        val state = State()
+        fun draw(canvas:Canvas, paint:Paint) {
+            canvas.save()
+            canvas.translate(x,y)
+            for(i in 0..3) {
+                canvas.save()
+                canvas.rotate(i*90f)
+                canvas.save()
+                canvas.translate(-w/2, -w/2)
+                for(j in 0..2) {
+                    canvas.save()
+                    canvas.translate(j*w/2,0f)
+                    canvas.drawRect(RectF(-w/10, -w/10, w/10, w/10), paint)
+                    if(j < 2) {
+                        canvas.drawLine(0f, 0f, (w / 2) * state.scales[j], 0f, paint)
+                    }
+                    canvas.restore()
+                }
+                canvas.restore()
+                canvas.save()
+                canvas.translate(w/2, -w/2)
+                canvas.drawLine(0f, 0f , -w/2 * state.scales[2] , w/2 * state.scales[2], paint)
+                canvas.restore()
+                canvas.restore()
+            }
+            canvas.drawRect(RectF(-w/10, -w/10, w/10, w/10),paint)
+            canvas.restore()
+        }
+        fun update(stopcb: (Float) -> Unit) {
+            state.update(stopcb)
+        }
+        fun startUpdating(startcb: () -> Unit) {
+            state.startUpdating(startcb)
+        }
+    }
 }
