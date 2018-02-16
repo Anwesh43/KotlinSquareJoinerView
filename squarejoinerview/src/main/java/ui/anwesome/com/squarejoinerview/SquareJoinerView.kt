@@ -3,6 +3,7 @@ package ui.anwesome.com.squarejoinerview
 /**
  * Created by anweshmishra on 17/02/18.
  */
+import android.app.Activity
 import android.view.*
 import android.content.*
 import android.graphics.*
@@ -125,6 +126,13 @@ class SquareJoinerView(ctx:Context):View(ctx) {
             joiner?.startUpdating {
                 animator.start()
             }
+        }
+    }
+    companion object {
+        fun create(activity:Activity):SquareJoinerView {
+            val view = SquareJoinerView(activity)
+            activity.setContentView(view)
+            return view
         }
     }
 }
