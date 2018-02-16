@@ -22,7 +22,7 @@ class SquareJoinerView(ctx:Context):View(ctx) {
         }
         return true
     }
-    data class State(var j:Int = 0, var prevScale:Float = 0f, var jDir:Int = 0, var dir:Float = 0f) {
+    data class State(var j:Int = 0, var prevScale:Float = 0f, var jDir:Int = 1, var dir:Float = 0f) {
         var scales:Array<Float> = arrayOf(0f,0f,0f)
         fun update(stopcb: (Float) -> Unit) {
             scales[j] += dir*0.1f
