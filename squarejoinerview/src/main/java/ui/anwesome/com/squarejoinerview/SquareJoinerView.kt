@@ -113,6 +113,9 @@ class SquareJoinerView(ctx:Context):View(ctx) {
                 val w = canvas.width.toFloat()
                 val h = canvas.height.toFloat()
                 joiner = SquareJoiner(w/2, h/2, 2*Math.min(w,h)/3)
+                paint.color = Color.parseColor("#1A237E")
+                paint.strokeWidth = Math.min(w,h)/45
+                paint.strokeCap = Paint.Cap.ROUND
             }
             canvas.drawColor(Color.parseColor("#212121"))
             joiner?.draw(canvas,paint)
