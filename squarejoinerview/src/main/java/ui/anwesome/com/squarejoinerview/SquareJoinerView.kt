@@ -103,4 +103,28 @@ class SquareJoinerView(ctx:Context):View(ctx) {
             state.startUpdating(startcb)
         }
     }
+    data class Renderer(var view: SquareJoinerView, var time: Int = 0) {
+        val animator = Animator(view)
+        var joiner:SquareJoiner ?= null
+        fun render(canvas:Canvas, paint:Paint) {
+            if(time == 0) {
+                val w = canvas.width.toFloat()
+                val h = canvas.height.toFloat()
+                joiner = SquareJoiner(w/2, h/2, 2*Math.min(w,h)/3)
+            }
+            canvas.drawColor(Color.parseColor("#212121"))
+            joiner?.draw(canvas,paint)
+            time++
+            animator.animate {
+                joiner?.update {
+                    animator.stop()
+                }
+            }
+        }
+        fun handleTap() {
+            joiner?.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
