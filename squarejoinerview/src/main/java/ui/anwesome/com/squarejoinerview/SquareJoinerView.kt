@@ -7,6 +7,7 @@ import android.app.Activity
 import android.view.*
 import android.content.*
 import android.graphics.*
+import android.util.Log
 
 class SquareJoinerView(ctx:Context):View(ctx) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -28,8 +29,10 @@ class SquareJoinerView(ctx:Context):View(ctx) {
     }
     data class State(var j:Int = 0, var prevScale:Float = 0f, var jDir:Int = 1, var dir:Float = 0f) {
         var scales:Array<Float> = arrayOf(0f,0f,0f)
-        fun update(stopcb: (Float) -> Unit) {
+        fun update(stopcb: (Float) -> Unit, updatecb: (Float) -> Unit) {
             scales[j] += dir*0.1f
+            val scaleFactor = (j+scales[j]) / scales.size
+            updatecb(scaleFactor)
             if(Math.abs(scales[j] - prevScale) > 1) {
                 scales[j] = prevScale + dir
                 j += jDir
@@ -86,7 +89,7 @@ class SquareJoinerView(ctx:Context):View(ctx) {
                 for(j in 0..2) {
                     canvas.save()
                     canvas.translate(j*w/2,0f)
-                    canvas.drawRect(RectF(-w/10, -w/10, w/10, w/10), paint)
+                    canvas.drawRoundRect(RectF(-w/10, -w/10, w/10, w/10), w/40, w/40, paint)
                     if(j < 2) {
                         canvas.drawLine(0f, 0f, (w / 2) * state.scales[j], 0f, paint)
                     }
@@ -99,11 +102,11 @@ class SquareJoinerView(ctx:Context):View(ctx) {
                 canvas.restore()
                 canvas.restore()
             }
-            canvas.drawRect(RectF(-w/10, -w/10, w/10, w/10),paint)
+            canvas.drawRoundRect(RectF(-w/10, -w/10, w/10, w/10), w/40, w/40, paint)
             canvas.restore()
         }
-        fun update(stopcb: (Float) -> Unit) {
-            state.update(stopcb)
+        fun update(stopcb: (Float) -> Unit,updatecb: (Float) -> Unit) {
+            state.update(stopcb, updatecb)
         }
         fun startUpdating(startcb: () -> Unit) {
             state.startUpdating(startcb)
@@ -112,25 +115,36 @@ class SquareJoinerView(ctx:Context):View(ctx) {
     data class Renderer(var view: SquareJoinerView, var time: Int = 0) {
         val animator = Animator(view)
         var joiner:SquareJoiner ?= null
+        var sf:Float = 0f
         fun render(canvas:Canvas, paint:Paint) {
+            val w = canvas.width.toFloat()
+            val h = canvas.height.toFloat()
             if(time == 0) {
-                val w = canvas.width.toFloat()
-                val h = canvas.height.toFloat()
                 joiner = SquareJoiner(w/2, h/2, 2*Math.min(w,h)/3)
-                paint.color = Color.parseColor("#1A237E")
+                paint.color = Color.parseColor("#0D47A1")
                 paint.strokeWidth = Math.min(w,h)/45
                 paint.strokeCap = Paint.Cap.ROUND
             }
             canvas.drawColor(Color.parseColor("#212121"))
+            for(i in 0..1) {
+                val sw = paint.strokeWidth/2
+                val sy = sw/2+(h-sw) * i
+                val sx = sw/2 + (w - sw)*i
+                canvas.drawLine(0f, sy, w * sf, sy, paint)
+                canvas.drawLine(sx, 0f, sx, h * sf, paint)
+                Log.d("scaleFactor","$sf")
+            }
             joiner?.draw(canvas,paint)
             time++
             animator.animate {
-                joiner?.update {
+                joiner?.update({
                     animator.stop()
                     when(it) {
                         1f -> view.squareJoinListener?.onSquareJoinListener?.invoke()
                     }
-                }
+                },{
+                    sf = it
+                })
             }
         }
         fun handleTap() {
