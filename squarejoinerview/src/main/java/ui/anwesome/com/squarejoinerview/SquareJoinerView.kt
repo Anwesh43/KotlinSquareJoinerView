@@ -42,6 +42,7 @@ class SquareJoinerView(ctx:Context):View(ctx) {
                     prevScale  = scales[j]
                     dir = 0f
                     stopcb(prevScale)
+                    updatecb(prevScale)
                 }
             }
         }
@@ -126,13 +127,15 @@ class SquareJoinerView(ctx:Context):View(ctx) {
                 paint.strokeCap = Paint.Cap.ROUND
             }
             canvas.drawColor(Color.parseColor("#212121"))
-            for(i in 0..1) {
-                val sw = paint.strokeWidth/2
-                val sy = sw/2+(h-sw) * i
-                val sx = sw/2 + (w - sw)*i
-                canvas.drawLine(0f, sy, w * sf, sy, paint)
-                canvas.drawLine(sx, 0f, sx, h * sf, paint)
-                Log.d("scaleFactor","$sf")
+            if(sf != 0f) {
+                for (i in 0..1) {
+                    val sw = paint.strokeWidth / 2
+                    val sy = sw / 2 + (h - sw) * i
+                    val sx = sw / 2 + (w - sw) * i
+                    canvas.drawLine(0f, sy, w * sf, sy, paint)
+                    canvas.drawLine(sx, 0f, sx, h * sf, paint)
+                    Log.d("scaleFactor", "$sf")
+                }
             }
             joiner?.draw(canvas,paint)
             time++
