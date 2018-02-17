@@ -11,6 +11,10 @@ import android.graphics.*
 class SquareJoinerView(ctx:Context):View(ctx) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     val renderer = Renderer(this)
+    var squareJoinListener:SquareJoinListener ?= null
+    fun addOnSquareJoinListener(onSquareJoinListener: () -> Unit) {
+        squareJoinListener = SquareJoinListener(onSquareJoinListener)
+    }
     override fun onDraw(canvas:Canvas) {
         renderer.render(canvas,paint)
     }
@@ -123,6 +127,9 @@ class SquareJoinerView(ctx:Context):View(ctx) {
             animator.animate {
                 joiner?.update {
                     animator.stop()
+                    when(it) {
+                        1f -> view.squareJoinListener?.onSquareJoinListener?.invoke()
+                    }
                 }
             }
         }
@@ -139,4 +146,5 @@ class SquareJoinerView(ctx:Context):View(ctx) {
             return view
         }
     }
+    data class SquareJoinListener(var onSquareJoinListener:() -> Unit)
 }
